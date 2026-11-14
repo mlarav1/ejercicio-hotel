@@ -101,4 +101,114 @@ public class SistemaHotel {
         System.out.println("Reservas pendientes: " + colaPendientes.tamanio());
         System.out.println("Reservas procesadas: " + historialProcesados.tamanio());
     }
+
+    private String leerTexto(String mensaje) {
+        System.out.print(mensaje);
+        return scanner.nextLine();
+    }
+
+    private int leerEntero(String mensaje) {
+        while (true) {
+            try {
+                return Integer.parseInt(leerTexto(mensaje).trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Error: debe ingresar un numero entero valido.");
+            }
+        }
+    }
+
+    private void mostrarMenu() {
+        System.out.println();
+        System.out.println("===== HOTEL - GESTION DE RESERVAS =====");
+        System.out.println("1. Registrar reserva");
+        System.out.println("2. Ver todas las reservas registradas");
+        System.out.println("3. Ver reservas pendientes");
+        System.out.println("4. Procesar siguiente reserva");
+        System.out.println("5. Ver historial de reservas procesadas");
+        System.out.println("6. Buscar reserva por codigo");
+        System.out.println("7. Cancelar reserva pendiente");
+        System.out.println("8. Deshacer ultimo procesamiento");
+        System.out.println("9. Ver cantidad de reservas");
+        System.out.println("10. Salir");
+    }
+
+    private void opcionRegistrar() {
+        String codigo = leerTexto("Codigo de reserva: ");
+        String huesped = leerTexto("Nombre del huesped: ");
+        int habitacion = leerEntero("Numero de habitacion: ");
+        int noches = leerEntero("Numero de noches: ");
+        if (registrarReserva(codigo, huesped, habitacion, noches)) {
+            System.out.println("Reserva registrada y enviada a pendientes.");
+        } else {
+            System.out.println("Error: ya existe una reserva con ese codigo.");
+        }
+    }
+
+    private void opcionBuscar() {
+        ReservaHabitacion reserva = buscarReserva(leerTexto("Codigo a buscar: "));
+        if (reserva == null) {
+            System.out.println("No se encontro ninguna reserva con ese codigo.");
+        } else {
+            System.out.println("Encontrada: " + reserva);
+        }
+    }
+
+    private void opcionCancelar() {
+        if (cancelarPendiente(leerTexto("Codigo de la reserva pendiente a cancelar: "))) {
+            System.out.println("Reserva cancelada correctamente.");
+        } else {
+            System.out.println("No existe una reserva pendiente con ese codigo.");
+        }
+    }
+
+    public void ejecutar() {
+        boolean salir = false;
+        while (!salir) {
+            mostrarMenu();
+            int opcion = leerEntero("Seleccione una opcion: ");
+            try {
+                switch (opcion) {
+                    case 1:
+                        opcionRegistrar();
+                        break;
+                    case 2:
+                        mostrarTodas();
+                        break;
+                    case 3:
+                        mostrarPendientes();
+                        break;
+                    case 4:
+                        System.out.println("Procesada: " + procesarSiguiente());
+                        break;
+                    case 5:
+                        mostrarHistorial();
+                        break;
+                    case 6:
+                        opcionBuscar();
+                        break;
+                    case 7:
+                        opcionCancelar();
+                        break;
+                    case 8:
+                        System.out.println("Procesamiento deshecho: " + deshacerUltimoProcesamiento());
+                        break;
+                    case 9:
+                        mostrarCantidades();
+                        break;
+                    case 10:
+                        salir = true;
+                        System.out.println("Hasta pronto.");
+                        break;
+                    default:
+                        System.out.println("Opcion invalida. Elija entre 1 y 10.");
+                }
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        new SistemaHotel().ejecutar();
+    }
 }
