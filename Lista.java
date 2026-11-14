@@ -70,4 +70,109 @@ public class Lista {
             i--;
         }
     }
+
+    public void agregarEnPosicion(int indice, Object dato) {
+        if (indice < 0 || indice > tamanio) {
+            throw new IndexOutOfBoundsException("Indice fuera de rango: " + indice);
+        }
+        if (indice == 0) {
+            agregarAlInicio(dato);
+        } else if (indice == tamanio) {
+            agregar(dato);
+        } else {
+            Nodo siguiente = obtenerNodo(indice);
+            Nodo anterior = siguiente.getIzquierda();
+            Nodo nuevo = new Nodo(dato);
+            nuevo.setIzquierda(anterior);
+            nuevo.setDerecha(siguiente);
+            anterior.setDerecha(nuevo);
+            siguiente.setIzquierda(nuevo);
+            tamanio++;
+        }
+    }
+
+    public Object eliminarPrimero() {
+        if (primero == null) {
+            throw new IllegalStateException("La lista esta vacia.");
+        }
+        Object dato = primero.getDato();
+        primero = primero.getDerecha();
+        if (primero == null) {
+            ultimo = null;
+        } else {
+            primero.setIzquierda(null);
+        }
+        tamanio--;
+        return dato;
+    }
+
+    public Object eliminarUltimo() {
+        if (ultimo == null) {
+            throw new IllegalStateException("La lista esta vacia.");
+        }
+        Object dato = ultimo.getDato();
+        ultimo = ultimo.getIzquierda();
+        if (ultimo == null) {
+            primero = null;
+        } else {
+            ultimo.setDerecha(null);
+        }
+        tamanio--;
+        return dato;
+    }
+
+    public Object eliminarEnPosicion(int indice) {
+        if (indice < 0 || indice >= tamanio) {
+            throw new IndexOutOfBoundsException("Indice fuera de rango: " + indice);
+        }
+        if (indice == 0) {
+            return eliminarPrimero();
+        }
+        if (indice == tamanio - 1) {
+            return eliminarUltimo();
+        }
+        Nodo actual = obtenerNodo(indice);
+        actual.getIzquierda().setDerecha(actual.getDerecha());
+        actual.getDerecha().setIzquierda(actual.getIzquierda());
+        tamanio--;
+        return actual.getDato();
+    }
+
+    public Object buscarDato(int indice) {
+        if (indice < 0 || indice >= tamanio) {
+            throw new IndexOutOfBoundsException("Indice fuera de rango: " + indice);
+        }
+        return obtenerNodo(indice).getDato();
+    }
+
+    public Object buscarDato(Object dato) {
+        Nodo actual = primero;
+        while (actual != null) {
+            if (actual.getDato().equals(dato)) {
+                return actual.getDato();
+            }
+            actual = actual.getDerecha();
+        }
+        return null;
+    }
+
+    public boolean contiene(Object dato) {
+        return buscarDato(dato) != null;
+    }
+
+    private Nodo obtenerNodo(int indice) {
+        Nodo actual;
+        if (indice < tamanio / 2) {
+            actual = primero;
+            for (int i = 0; i < indice; i++) {
+                actual = actual.getDerecha();
+            }
+        } else {
+            actual = ultimo;
+            for (int i = tamanio - 1; i > indice; i--) {
+                actual = actual.getIzquierda();
+            }
+        }
+        return actual;
+    }
 }
